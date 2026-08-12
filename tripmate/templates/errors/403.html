@@ -1,0 +1,2 @@
+{% extends "base.html" %}{% block title %}无权操作 · TripMate{% endblock %}{% block content %}<section class="error-page"><span>403</span><h1>你没有执行此操作的权限</h1><p>只有资源拥有者可以处理这项操作。</p><a class="button button-primary" href="{{ url_for('main.home') }}">返回首页</a></section>{% endblock %}
+

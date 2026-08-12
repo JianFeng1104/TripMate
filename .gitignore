@@ -7,4 +7,8 @@ __pycache__/
 htmlcov/
 .env
 *.db
+_tmp/
+_pip_cache/
+_pycache/
+.cache/
 

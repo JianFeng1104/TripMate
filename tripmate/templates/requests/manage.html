@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}申请管理 · TripMate{% endblock %}
+{% block content %}
+<section class="page-head"><p class="eyebrow">JOIN REQUESTS</p><h1>同行申请管理</h1><p>只有计划创建者可以处理申请。每一次操作都会同步给申请人。</p></section>
+{% if items %}
+  <div class="request-list">
+  {% for item in items %}
+    <article class="request-card">
+      <div class="request-person"><span class="avatar avatar-large">{{ item.applicant.username[0]|upper }}</span><div><h2>@{{ item.applicant.username }}</h2><p>{{ item.applicant.bio or '这位旅行者还没有填写简介。' }}</p></div></div>
+      <div class="request-trip"><span class="mini-label">申请加入</span><a href="{{ url_for('main.trip_detail', trip_id=item.trip.id) }}">{{ item.trip.destination }}</a><small>{{ item.trip.start_date }} — {{ item.trip.end_date }}</small></div>
+      <blockquote>{{ item.message or '未填写申请留言。' }}</blockquote>
+      <div class="request-actions">
+        <span class="status status-{{ item.status|lower }}">{{ {'PENDING':'等待处理','ACCEPTED':'已接受','REJECTED':'已拒绝'}[item.status] }}</span>
+        {% if item.status == 'PENDING' %}
+          <form method="post" action="{{ url_for('main.handle_request', request_id=item.id, action='reject') }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button class="button button-ghost" type="submit">拒绝</button></form>
+          <form method="post" action="{{ url_for('main.handle_request', request_id=item.id, action='accept') }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button class="button button-primary" type="submit">接受同行</button></form>
+        {% endif %}
+      </div>
+    </article>
+  {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state"><span>◎</span><h2>还没有收到同行申请</h2><p>发布一条信息完整的旅行计划，让合适的人找到你。</p><a class="button button-primary" href="{{ url_for('main.create_trip') }}">发布计划</a></div>
+{% endif %}
+{% endblock %}
+

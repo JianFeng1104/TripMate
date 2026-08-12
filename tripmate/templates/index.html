@@ -2,9 +2,27 @@
 {% block title %}TripMate · 旅行搭子平台{% endblock %}
 {% block content %}
 <section class="hero">
-  <p class="eyebrow">TRAVEL TOGETHER</p>
-  <h1>目的地相同，旅程可以不同凡响。</h1>
-  <p>发布旅行计划，发现时间相近的旅行者，发出同行申请并确认你的下一位旅伴。</p>
+  <div class="hero-copy">
+    <p class="eyebrow">TRAVEL TOGETHER</p>
+    <h1>目的地相同，<br><em>旅程由你们定义。</em></h1>
+    <p class="hero-lead">发布一条清晰的旅行计划，发现时间相近、风格合拍的旅行者，完成从申请到确认同行的每一步。</p>
+    <div class="button-row">
+      <a class="button button-primary" href="{{ url_for('auth.register') }}">免费创建账号</a>
+      <a class="button button-ghost" href="{{ url_for('auth.login') }}">已有账号，登录</a>
+    </div>
+  </div>
+  <aside class="hero-card" aria-label="产品流程">
+    <span class="mini-label">一次完整的同行闭环</span>
+    <ol class="flow-list">
+      <li><span>01</span><div><strong>发布计划</strong><small>目的地、日期、旅行风格</small></div></li>
+      <li><span>02</span><div><strong>收到申请</strong><small>了解对方的同行想法</small></div></li>
+      <li><span>03</span><div><strong>确认同行</strong><small>接受或拒绝，状态清晰可见</small></div></li>
+    </ol>
+  </aside>
+</section>
+<section class="trust-strip" aria-label="产品原则">
+  <div><strong>清晰</strong><span>围绕真实旅行计划连接</span></div>
+  <div><strong>克制</strong><span>不收集住址和证件信息</span></div>
+  <div><strong>完整</strong><span>申请状态对双方透明</span></div>
 </section>
 {% endblock %}
-

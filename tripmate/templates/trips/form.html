@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}发布旅行计划 · TripMate{% endblock %}
+{% block content %}
+<section class="page-head"><p class="eyebrow">CREATE A TRIP</p><h1>发布旅行计划</h1><p>清晰的信息更容易吸引真正合适的同行者。</p></section>
+<form class="form-card wide-form" method="post" novalidate>
+  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+  <label>目的地 <span>2–100 字</span>
+    <input name="destination" maxlength="100" required placeholder="例如：日本 · 东京" value="{{ form.destination }}">
+  </label>
+  <div class="form-row">
+    <label>开始日期<input type="date" name="start_date" required value="{{ form.start_date }}"></label>
+    <label>结束日期<input type="date" name="end_date" required value="{{ form.end_date }}"></label>
+  </div>
+  <div class="form-row">
+    <label>旅行风格
+      <select name="style" required>{% for style in styles %}<option value="{{ style }}" {% if form.style == style %}selected{% endif %}>{{ style }}</option>{% endfor %}</select>
+    </label>
+    <label>期望同行人数 <span>1–20 人</span><input type="number" name="expected_companions" min="1" max="20" required value="{{ form.expected_companions }}"></label>
+  </div>
+  <label>旅行简介 <span>10–1000 字</span>
+    <textarea name="description" minlength="10" maxlength="1000" rows="8" required placeholder="写下大致安排、节奏、兴趣与对同行者的期待。不要填写住址或证件信息。">{{ form.description }}</textarea>
+  </label>
+  <div class="form-actions"><a class="button button-ghost" href="{{ url_for('main.trips') }}">取消</a><button class="button button-primary" type="submit">发布计划</button></div>
+</form>
+{% endblock %}
+

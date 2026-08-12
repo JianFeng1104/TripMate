@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ trip.destination }} · TripMate{% endblock %}
+{% block content %}
+<article class="detail-layout">
+  <section class="trip-detail">
+    <div class="detail-meta"><span class="status status-{{ trip.status|lower }}">{{ '开放申请' if trip.status == 'OPEN' else '已关闭' }}</span><span>{{ trip.style }}</span><span>由 @{{ trip.creator.username }} 发布</span></div>
+    <h1>{{ trip.destination }}</h1>
+    <p class="detail-date">{{ trip.start_date.strftime('%Y 年 %m 月 %d 日') }} — {{ trip.end_date.strftime('%Y 年 %m 月 %d 日') }}</p>
+    <div class="prose"><h2>关于这段旅程</h2><p>{{ trip.description }}</p></div>
+    {% if trip.creator.bio %}<div class="creator-note"><strong>发起人简介</strong><p>{{ trip.creator.bio }}</p></div>{% endif %}
+    <section class="companions"><h2>已确认同行者 <span>{{ trip.accepted_requests|length }} / {{ trip.expected_companions }}</span></h2>
+      {% if trip.accepted_requests %}<div class="people-list">{% for item in trip.accepted_requests %}<div><span class="avatar">{{ item.applicant.username[0]|upper }}</span><span><strong>@{{ item.applicant.username }}</strong><small>{{ item.applicant.bio or 'TripMate 旅行者' }}</small></span></div>{% endfor %}</div>
+      {% else %}<p class="muted">还没有已确认的同行者。</p>{% endif %}
+    </section>
+  </section>
+  <aside class="action-panel">
+    <div><span class="mini-label">同行名额</span><strong class="big-number">{{ trip.remaining_spots }}</strong><span>位可确认</span></div>
+    {% if trip.creator_id == g.user.id %}
+      <p>这是你发布的旅行计划。你可以在申请管理中处理收到的请求。</p>
+      <a class="button button-primary button-full" href="{{ url_for('main.manage_requests') }}">管理同行申请</a>
+      {% if trip.status == 'OPEN' %}<form method="post" action="{{ url_for('main.close_trip', trip_id=trip.id) }}" data-confirm="关闭后将不再接受或批准申请，确定继续吗？"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button class="button button-danger button-full" type="submit">关闭计划</button></form>{% endif %}
+    {% elif own_request %}
+      <p>你已提交同行申请。</p><span class="status status-{{ own_request.status|lower }}">{{ {'PENDING':'等待处理','ACCEPTED':'已接受','REJECTED':'已拒绝'}[own_request.status] }}</span>
+    {% elif trip.status == 'OPEN' and trip.remaining_spots > 0 %}
+      <form method="post" action="{{ url_for('main.apply_to_trip', trip_id=trip.id) }}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <label>申请留言 <span>可选，最多 500 字</span><textarea name="message" maxlength="500" rows="5" placeholder="简单介绍为什么这段旅程适合你。"></textarea></label>
+        <button class="button button-primary button-full" type="submit">申请加入</button>
+      </form>
+    {% else %}<p>该计划当前不接受新的同行申请。</p>{% endif %}
+  </aside>
+</article>
+{% endblock %}
+

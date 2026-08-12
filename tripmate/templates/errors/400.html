@@ -1,0 +1,2 @@
+{% extends "base.html" %}{% block title %}请求无效 · TripMate{% endblock %}{% block content %}<section class="error-page"><span>400</span><h1>这次请求没有通过检查</h1><p>{{ error.description }}</p><a class="button button-primary" href="{{ url_for('main.home') }}">返回首页</a></section>{% endblock %}
+
