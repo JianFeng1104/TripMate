@@ -6,10 +6,11 @@
   <title>{% block title %}TripMate{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 </head>
-<body>
+<body class="{% if g.user %}is-authenticated{% else %}is-guest{% endif %}">
+  <div class="ambient-grid" aria-hidden="true"></div>
   <header class="site-header">
     <div class="nav-shell">
-      <a class="brand" href="{{ url_for('main.home') }}">TripMate<span>.</span></a>
+      <a class="brand" href="{{ url_for('main.home') }}"><span class="brand-mark">TM</span><span class="brand-copy">TripMate<small>EXPEDITION NETWORK</small></span></a>
       <nav aria-label="主导航">
         {% if g.user %}
           <a href="{{ url_for('main.trips') }}">发现旅程</a>
@@ -27,20 +28,31 @@
       </nav>
     </div>
   </header>
-  <main class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="flash-stack" aria-live="polite">
-          {% for category, message in messages %}
-            <div class="flash flash-{{ category }}">{{ message }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
-    {% block content %}{% endblock %}
-  </main>
+  <div class="page-shell">
+    {% if g.user %}
+    <aside class="mission-rail">
+      <div class="rail-live"><i></i><span>NETWORK ONLINE</span></div>
+      <div class="rail-coordinate"><small>YOUR CALLSIGN</small><strong>@{{ g.user.username }}</strong></div>
+      <div class="rail-coordinate"><small>BASE</small><strong>31.2304° N<br>121.4737° E</strong></div>
+      <div class="rail-route" aria-hidden="true"><span></span><span></span><span></span></div>
+      <p>发布计划<br>确认同行<br>共同出发</p>
+    </aside>
+    {% endif %}
+    <main class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-stack" aria-live="polite">
+            {% for category, message in messages %}
+              <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
   <footer>
-    <div class="footer-inner"><strong>TripMate MVP</strong><span>从明确的计划开始，建立可信赖的同行连接。</span></div>
+    <div class="footer-inner"><strong>TRIPMATE / MVP-01</strong><span>MAKE PLANS · FIND PEOPLE · MOVE TOGETHER</span></div>
   </footer>
   <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
 </body>

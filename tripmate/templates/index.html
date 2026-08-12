@@ -3,26 +3,30 @@
 {% block content %}
 <section class="hero">
   <div class="hero-copy">
-    <p class="eyebrow">TRAVEL TOGETHER</p>
-    <h1>目的地相同，<br><em>旅程由你们定义。</em></h1>
-    <p class="hero-lead">发布一条清晰的旅行计划，发现时间相近、风格合拍的旅行者，完成从申请到确认同行的每一步。</p>
+    <div class="hero-signal"><span></span>LIVE TRAVEL NETWORK · 2026</div>
+    <p class="eyebrow">BUILD YOUR CREW</p>
+    <h1>独自计划。<br><em>结伴出发。</em></h1>
+    <p class="hero-lead">把目的地、日期与旅行方式变成一张清晰的任务卡。找到时间重合的人，在出发前完成每一次同行确认。</p>
     <div class="button-row">
-      <a class="button button-primary" href="{{ url_for('auth.register') }}">免费创建账号</a>
-      <a class="button button-ghost" href="{{ url_for('auth.login') }}">已有账号，登录</a>
+      <a class="button button-primary" href="{{ url_for('auth.register') }}">建立旅行档案 ↗</a>
+      <a class="button button-ghost" href="{{ url_for('auth.login') }}">进入控制台</a>
     </div>
+    <div class="hero-coordinates"><span>31.2304° N</span><span>121.4737° E</span><span>UTC +08:00</span></div>
   </div>
-  <aside class="hero-card" aria-label="产品流程">
-    <span class="mini-label">一次完整的同行闭环</span>
-    <ol class="flow-list">
-      <li><span>01</span><div><strong>发布计划</strong><small>目的地、日期、旅行风格</small></div></li>
-      <li><span>02</span><div><strong>收到申请</strong><small>了解对方的同行想法</small></div></li>
-      <li><span>03</span><div><strong>确认同行</strong><small>接受或拒绝，状态清晰可见</small></div></li>
+  <aside class="mission-board" aria-label="产品流程">
+    <div class="board-head"><span>MISSION / 001</span><strong>同行流程</strong><i>OPEN</i></div>
+    <div class="route-map" aria-hidden="true"><span class="route-origin">A</span><span class="route-line"></span><span class="route-stop one"></span><span class="route-stop two"></span><span class="route-destination">B</span></div>
+    <ol class="board-steps">
+      <li><span>01</span><div><strong>发布目的地</strong><small>日期 · 风格 · 人数</small></div></li>
+      <li><span>02</span><div><strong>接收同行申请</strong><small>资料 · 留言 · 状态</small></div></li>
+      <li><span>03</span><div><strong>锁定同行成员</strong><small>接受 · 拒绝 · 出发</small></div></li>
     </ol>
+    <div class="board-foot"><span>NO CHAT</span><span>NO PAYMENT</span><span>JUST THE PLAN</span></div>
   </aside>
 </section>
 <section class="trust-strip" aria-label="产品原则">
-  <div><strong>清晰</strong><span>围绕真实旅行计划连接</span></div>
-  <div><strong>克制</strong><span>不收集住址和证件信息</span></div>
-  <div><strong>完整</strong><span>申请状态对双方透明</span></div>
+  <div><strong>01 / STRUCTURED</strong><span>所有连接都围绕明确的旅行计划</span></div>
+  <div><strong>02 / PRIVATE</strong><span>不收集住址、证件和支付信息</span></div>
+  <div><strong>03 / VISIBLE</strong><span>申请与确认状态对双方保持透明</span></div>
 </section>
 {% endblock %}
