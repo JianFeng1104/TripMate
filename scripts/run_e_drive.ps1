@@ -7,12 +7,12 @@ $ErrorActionPreference = "Stop"
 $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 
 if ([System.IO.Path]::GetPathRoot($ProjectRoot) -ne "E:\") {
-    throw "安全检查失败：项目必须位于 E 盘，当前目录为 $ProjectRoot"
+    throw "Safety check failed: the project must be stored on drive E. Current path: $ProjectRoot"
 }
 
 $VenvPython = Join-Path $ProjectRoot ".venv\Scripts\python.exe"
 if (-not (Test-Path -LiteralPath $VenvPython -PathType Leaf)) {
-    throw "未找到 E 盘虚拟环境。请先运行 .\scripts\setup_e_drive.ps1"
+    throw "The E-drive virtual environment was not found. Run .\scripts\setup_e_drive.ps1 first."
 }
 
 $env:TEMP = Join-Path $ProjectRoot ".tmp"
@@ -29,10 +29,9 @@ try {
     if ($SeedDemo) {
         & $VenvPython -m flask --app run:app seed-demo
     }
-    Write-Host "TripMate 正在启动：http://127.0.0.1:$Port"
-    & $VenvPython -m flask --app run:app run --host 127.0.0.1 --port $Port --debug
+    Write-Host "TripMate is starting at http://127.0.0.1:$Port"
+    & $VenvPython -m flask --app run:app run --host 127.0.0.1 --port $Port --no-debugger --no-reload
 }
 finally {
     Pop-Location
 }
-

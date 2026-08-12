@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 
 if ([System.IO.Path]::GetPathRoot($ProjectRoot) -ne "E:\") {
-    throw "安全检查失败：项目必须位于 E 盘，当前目录为 $ProjectRoot"
+    throw "Safety check failed: the project must be stored on drive E. Current path: $ProjectRoot"
 }
 
 if (-not (Test-Path -LiteralPath $PythonExecutable -PathType Leaf)) {
@@ -23,16 +23,15 @@ New-Item -ItemType Directory -Force -Path $env:TEMP, $env:PIP_CACHE_DIR, $env:PY
 
 $VenvPython = Join-Path $ProjectRoot ".venv\Scripts\python.exe"
 if (-not (Test-Path -LiteralPath $VenvPython -PathType Leaf)) {
-    Write-Host "正在 E 盘创建虚拟环境..."
+    Write-Host "Creating the virtual environment on drive E..."
     & $PythonExecutable -m venv (Join-Path $ProjectRoot ".venv")
 }
 
-Write-Host "正在把依赖安装到 E 盘虚拟环境..."
+Write-Host "Installing dependencies into the E-drive virtual environment..."
 & $VenvPython -m pip install -r (Join-Path $ProjectRoot "requirements.txt")
 
 Write-Host ""
-Write-Host "TripMate 环境准备完成。"
-Write-Host "虚拟环境：$(Join-Path $ProjectRoot '.venv')"
-Write-Host "pip 缓存：$env:PIP_CACHE_DIR"
-Write-Host "下一步：.\scripts\run_e_drive.ps1 -SeedDemo"
-
+Write-Host "TripMate setup is complete."
+Write-Host "Virtual environment: $(Join-Path $ProjectRoot '.venv')"
+Write-Host "pip cache: $env:PIP_CACHE_DIR"
+Write-Host "Next: .\scripts\run_e_drive.ps1 -SeedDemo"
