@@ -3,30 +3,25 @@
 {% block content %}
 <section class="hero">
   <div class="hero-copy">
-    <div class="hero-signal"><span></span>LIVE TRAVEL NETWORK · 2026</div>
-    <p class="eyebrow">BUILD YOUR CREW</p>
-    <h1>独自计划。<br><em>结伴出发。</em></h1>
-    <p class="hero-lead">把目的地、日期与旅行方式变成一张清晰的任务卡。找到时间重合的人，在出发前完成每一次同行确认。</p>
+    <p class="eyebrow">PLAN LESS · GO FURTHER</p>
+    <h1>想去的地方，<br><em>一起出发。</em></h1>
+    <p class="hero-lead">写下目的地、日期和你喜欢的旅行节奏，找到刚好同路的人。没有复杂社交，先从一份清楚的计划开始。</p>
     <div class="button-row">
-      <a class="button button-primary" href="{{ url_for('auth.register') }}">建立旅行档案 ↗</a>
-      <a class="button button-ghost" href="{{ url_for('auth.login') }}">进入控制台</a>
+      <a class="button button-primary" href="{{ url_for('auth.register') }}">开始计划</a>
+      <a class="button button-ghost" href="{{ url_for('auth.login') }}">已有账号</a>
     </div>
-    <div class="hero-coordinates"><span>31.2304° N</span><span>121.4737° E</span><span>UTC +08:00</span></div>
   </div>
-  <aside class="mission-board" aria-label="产品流程">
-    <div class="board-head"><span>MISSION / 001</span><strong>同行流程</strong><i>OPEN</i></div>
-    <div class="route-map" aria-hidden="true"><span class="route-origin">A</span><span class="route-line"></span><span class="route-stop one"></span><span class="route-stop two"></span><span class="route-destination">B</span></div>
-    <ol class="board-steps">
-      <li><span>01</span><div><strong>发布目的地</strong><small>日期 · 风格 · 人数</small></div></li>
-      <li><span>02</span><div><strong>接收同行申请</strong><small>资料 · 留言 · 状态</small></div></li>
-      <li><span>03</span><div><strong>锁定同行成员</strong><small>接受 · 拒绝 · 出发</small></div></li>
-    </ol>
-    <div class="board-foot"><span>NO CHAT</span><span>NO PAYMENT</span><span>JUST THE PLAN</span></div>
-  </aside>
+  <figure class="hero-visual">
+    <img src="{{ url_for('static', filename='img/tokyo-night.jpg') }}" alt="东京夜晚街道与远处的东京塔">
+    <figcaption><span>Tokyo after dark</span><span>城市漫步 · 5 天</span></figcaption>
+  </figure>
 </section>
-<section class="trust-strip" aria-label="产品原则">
-  <div><strong>01 / STRUCTURED</strong><span>所有连接都围绕明确的旅行计划</span></div>
-  <div><strong>02 / PRIVATE</strong><span>不收集住址、证件和支付信息</span></div>
-  <div><strong>03 / VISIBLE</strong><span>申请与确认状态对双方保持透明</span></div>
+<section class="home-intro" aria-label="使用方式">
+  <div class="intro-heading"><p class="eyebrow">HOW IT WORKS</p><h2>旅行从一条<br>清楚的计划开始。</h2></div>
+  <div class="intro-list">
+    <article><span>目的地</span><h3>说清楚去哪里</h3><p>公开日期、旅行方式和期待人数，让合适的人更快看见你。</p></article>
+    <article><span>申请</span><h3>先了解，再同行</h3><p>查看简介和留言，是否接受由旅行发起人决定。</p></article>
+    <article><span>确认</span><h3>把同行关系定下来</h3><p>双方都能看到当前状态，人数满员后即可关闭计划。</p></article>
+  </div>
 </section>
 {% endblock %}
