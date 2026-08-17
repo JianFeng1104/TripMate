@@ -1,0 +1,1 @@
+{% extends "base.html" %}{% block title %}服务暂时不可用 · TripMate{% endblock %}{% block content %}<section class="error-page"><span>500</span><h1>服务暂时遇到问题</h1><p>我们没有完成这次请求，请稍后重试。错误详情不会在页面中公开。</p><a class="button button-primary" href="{{ url_for('main.home') }}">返回首页</a></section>{% endblock %}

@@ -4,13 +4,12 @@
 <section class="page-head split-head"><div><p class="eyebrow">MY TRIPS</p><h1>我的旅行</h1><p>集中查看你创建的计划与发出的同行申请。</p></div><a class="button button-primary" href="{{ url_for('main.create_trip') }}">＋ 发布计划</a></section>
 <section class="dashboard-section">
   <div class="section-title"><h2>我创建的计划</h2><span>{{ created|length }} 条</span></div>
-  {% if created %}<div class="record-list">{% for trip in created %}<a class="record" href="{{ url_for('main.trip_detail', trip_id=trip.id) }}"><div><span class="status status-{{ trip.status|lower }}">{{ '开放' if trip.status == 'OPEN' else '关闭' }}</span><h3>{{ trip.destination }}</h3><p>{{ trip.start_date }} — {{ trip.end_date }} · {{ trip.style }}</p></div><div class="record-stat"><strong>{{ trip.join_requests|selectattr('status', 'equalto', 'PENDING')|list|length }}</strong><span>待处理申请</span></div></a>{% endfor %}</div>
+  {% if created %}<div class="record-list">{% for trip in created %}<a class="record" href="{{ url_for('main.trip_detail', trip_id=trip.id) }}"><div><span class="status status-{{ trip.status|lower }}">{{ {'OPEN':'开放','CLOSED':'关闭','CANCELLED':'旅行取消'}[trip.status] }}</span><h3>{{ trip.destination }}</h3><p>{{ trip.start_date }} — {{ trip.end_date }} · {{ trip.style }}</p></div><div class="record-stat"><strong>{{ trip.join_requests|selectattr('status', 'equalto', 'PENDING')|list|length }}</strong><span>待处理申请</span></div></a>{% endfor %}</div>
   {% else %}<div class="empty-inline">你还没有创建旅行计划。<a href="{{ url_for('main.create_trip') }}">现在发布</a></div>{% endif %}
 </section>
 <section class="dashboard-section">
   <div class="section-title"><h2>我的同行申请</h2><span>{{ applications|length }} 条</span></div>
-  {% if applications %}<div class="record-list">{% for item in applications %}<a class="record" href="{{ url_for('main.trip_detail', trip_id=item.trip.id) }}"><div><span class="status status-{{ item.status|lower }}">{{ {'PENDING':'等待处理','ACCEPTED':'已接受','REJECTED':'已拒绝'}[item.status] }}</span><h3>{{ item.trip.destination }}</h3><p>发起人 @{{ item.trip.creator.username }} · 申请于 {{ item.created_at.strftime('%Y.%m.%d') }}</p></div><span class="record-arrow">→</span></a>{% endfor %}</div>
+  {% if applications %}<div class="record-list">{% for item in applications %}<a class="record" href="{{ url_for('main.trip_detail', trip_id=item.trip.id) }}"><div><span class="status status-{{ item.status|lower }}">{{ {'PENDING':'等待处理','ACCEPTED':'已接受','REJECTED':'已拒绝','CANCELLED':'已取消（系统）','WITHDRAWN':'已撤回'}[item.status] }}</span><h3>{{ item.trip.destination }}</h3><p>发起人 @{{ item.trip.creator.username }} · 申请于 {{ item.created_at.strftime('%Y.%m.%d') }}</p></div><span class="record-arrow">→</span></a>{% endfor %}</div>
   {% else %}<div class="empty-inline">你还没有申请加入任何旅行。<a href="{{ url_for('main.trips') }}">去发现旅程</a></div>{% endif %}
 </section>
 {% endblock %}
-

@@ -41,7 +41,9 @@ class Trip(db.Model):
         CheckConstraint(
             "expected_companions BETWEEN 1 AND 20", name="ck_trip_expected_companions"
         ),
-        CheckConstraint("status IN ('OPEN', 'CLOSED')", name="ck_trip_status"),
+        CheckConstraint(
+            "status IN ('OPEN', 'CLOSED', 'CANCELLED')", name="ck_trip_status"
+        ),
     )
 
     id = db.Column(db.Integer, primary_key=True)
@@ -77,7 +79,8 @@ class JoinRequest(db.Model):
     __table_args__ = (
         UniqueConstraint("trip_id", "applicant_id", name="uq_request_trip_applicant"),
         CheckConstraint(
-            "status IN ('PENDING', 'ACCEPTED', 'REJECTED')", name="ck_request_status"
+            "status IN ('PENDING', 'ACCEPTED', 'REJECTED', 'CANCELLED', 'WITHDRAWN')",
+            name="ck_request_status",
         ),
     )
 
@@ -91,4 +94,3 @@ class JoinRequest(db.Model):
 
     trip = db.relationship("Trip", back_populates="join_requests")
     applicant = db.relationship("User", back_populates="join_requests")
-

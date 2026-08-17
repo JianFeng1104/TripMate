@@ -16,6 +16,7 @@
           <a href="{{ url_for('main.create_trip') }}">发布计划</a>
           <a href="{{ url_for('main.my_trips') }}">我的旅行</a>
           <a href="{{ url_for('main.manage_requests') }}">申请管理</a>
+          <a href="{{ url_for('agent.travel_assistant') }}">旅行助手</a>
           <form action="{{ url_for('auth.logout') }}" method="post" class="inline-form">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <button class="link-button" type="submit">退出</button>

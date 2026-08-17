@@ -1,16 +1,16 @@
 from datetime import UTC, date, datetime
 
 from flask import Blueprint, abort, flash, g, redirect, render_template, request, url_for
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.exc import IntegrityError
 
 from .extensions import db
 from .models import JoinRequest, Trip
+from .services import TRAVEL_STYLES, search_trips
 from .utils import clean_text, login_required, validate_csrf
 
 
 bp = Blueprint("main", __name__)
-TRAVEL_STYLES = ("城市探索", "自然户外", "美食体验", "摄影打卡", "文化历史", "轻松度假", "其他")
 
 
 @bp.get("/")
@@ -23,14 +23,25 @@ def home():
 @bp.get("/trips")
 @login_required
 def trips():
-    query = clean_text(request.args.get("q"))[:100]
-    page = request.args.get("page", 1, type=int)
-    statement = select(Trip).where(Trip.status == "OPEN")
-    if query:
-        statement = statement.where(Trip.destination.ilike(f"%{query}%"))
-    statement = statement.order_by(Trip.start_date.asc(), Trip.created_at.desc())
-    pagination = db.paginate(statement, page=max(page, 1), per_page=9, error_out=False)
-    return render_template("trips/list.html", pagination=pagination, query=query)
+    filters = {
+        "destination": clean_text(request.args.get("q"))[:100],
+        "style": clean_text(request.args.get("style")),
+        "start_date": request.args.get("start_date", "").strip(),
+        "end_date": request.args.get("end_date", "").strip(),
+        "min_available_spots": request.args.get("min_available_spots", "").strip(),
+    }
+    page = request.args.get("page", 1, type=int) or 1
+    try:
+        result = search_trips(page=page, **filters)
+    except ValueError:
+        flash("筛选条件格式无效，请检查日期、旅行风格和剩余名额。", "error")
+        result = search_trips(page=1)
+    return render_template(
+        "trips/list.html",
+        result=result,
+        filters=filters,
+        styles=TRAVEL_STYLES,
+    )
 
 
 @bp.route("/trips/new", methods=("GET", "POST"))
@@ -48,7 +59,39 @@ def create_trip():
             db.session.commit()
             flash("旅行计划已发布，其他旅行者现在可以申请同行。", "success")
             return redirect(url_for("main.trip_detail", trip_id=trip.id))
-    return render_template("trips/form.html", form=form, styles=TRAVEL_STYLES)
+    return render_template("trips/form.html", form=form, styles=TRAVEL_STYLES, trip=None)
+
+
+@bp.route("/trips/<int:trip_id>/edit", methods=("GET", "POST"))
+@login_required
+def edit_trip(trip_id):
+    if request.method == "POST":
+        validate_csrf()
+    trip = db.get_or_404(Trip, trip_id)
+    if trip.creator_id != g.user.id:
+        abort(403)
+    if trip.status == "CANCELLED":
+        flash("已取消的旅行计划不能继续编辑。", "error")
+        return redirect(url_for("main.trip_detail", trip_id=trip.id))
+
+    form = _trip_form_values(trip)
+    if request.method == "POST":
+        error, parsed = _validate_trip_form(form)
+        accepted_count = len(trip.accepted_requests)
+        if not error and parsed["expected_companions"] < accepted_count:
+            error = f"期望同行人数不能少于当前已接受的 {accepted_count} 人。"
+        if error:
+            flash(error, "error")
+        else:
+            for field, value in parsed.items():
+                setattr(trip, field, value)
+            if trip.status == "OPEN" and accepted_count >= trip.expected_companions:
+                _close_trip(trip)
+            db.session.commit()
+            flash("旅行计划已更新。", "success")
+            return redirect(url_for("main.trip_detail", trip_id=trip.id))
+
+    return render_template("trips/form.html", form=form, styles=TRAVEL_STYLES, trip=trip)
 
 
 @bp.get("/trips/<int:trip_id>")
@@ -103,12 +146,33 @@ def close_trip(trip_id):
     trip = db.get_or_404(Trip, trip_id)
     if trip.creator_id != g.user.id:
         abort(403)
-    if trip.status == "CLOSED":
+    if trip.status == "CANCELLED":
+        flash("已取消的旅行计划不能改为关闭状态。", "info")
+        return redirect(url_for("main.trip_detail", trip_id=trip.id))
+    was_closed = trip.status == "CLOSED"
+    cancelled_count = _close_trip(trip)
+    if was_closed and cancelled_count == 0:
         flash("该旅行计划已经关闭。", "info")
     else:
-        trip.status = "CLOSED"
         db.session.commit()
         flash("旅行计划已关闭，不再接受新的同行申请。", "success")
+    return redirect(url_for("main.trip_detail", trip_id=trip.id))
+
+
+@bp.post("/trips/<int:trip_id>/cancel")
+@login_required
+def cancel_trip(trip_id):
+    validate_csrf()
+    trip = db.get_or_404(Trip, trip_id)
+    if trip.creator_id != g.user.id:
+        abort(403)
+    if trip.status == "CANCELLED":
+        flash("该旅行计划已经取消。", "info")
+    else:
+        trip.status = "CANCELLED"
+        _cancel_pending_requests(trip)
+        db.session.commit()
+        flash("旅行计划已取消，待处理的同行申请已由系统结束。", "success")
     return redirect(url_for("main.trip_detail", trip_id=trip.id))
 
 
@@ -158,6 +222,8 @@ def handle_request(request_id, action):
 
     if action == "accept":
         if trip.status != "OPEN" or trip.remaining_spots < 1:
+            _close_trip(trip)
+            db.session.commit()
             flash("计划已关闭或名额已满，无法接受此申请。", "error")
             return redirect(url_for("main.manage_requests"))
         item.status = "ACCEPTED"
@@ -169,7 +235,7 @@ def handle_request(request_id, action):
             )
         )
         if accepted_count >= trip.expected_companions:
-            trip.status = "CLOSED"
+            _close_trip(trip)
         flash(f"已接受 {item.applicant.username} 的同行申请。", "success")
     else:
         item.status = "REJECTED"
@@ -180,8 +246,53 @@ def handle_request(request_id, action):
     return redirect(url_for("main.manage_requests"))
 
 
-def _trip_form_values():
+@bp.post("/requests/<int:request_id>/withdraw")
+@login_required
+def withdraw_request(request_id):
+    validate_csrf()
+    item = db.get_or_404(JoinRequest, request_id)
+    if item.applicant_id != g.user.id:
+        abort(403)
+    if item.status != "PENDING":
+        flash("只有等待处理的同行申请可以撤回。", "info")
+    else:
+        item.status = "WITHDRAWN"
+        item.handled_at = datetime.now(UTC)
+        db.session.commit()
+        flash("同行申请已撤回。", "success")
+    return redirect(url_for("main.trip_detail", trip_id=item.trip_id))
+
+
+def _close_trip(trip):
+    """Close a trip and system-cancel only its still-pending requests."""
+    trip.status = "CLOSED"
+    return _cancel_pending_requests(trip)
+
+
+def _cancel_pending_requests(trip):
+    """System-cancel only pending requests for a no-longer-open trip."""
+    result = db.session.execute(
+        update(JoinRequest)
+        .where(
+            JoinRequest.trip_id == trip.id,
+            JoinRequest.status == "PENDING",
+        )
+        .values(status="CANCELLED", handled_at=datetime.now(UTC))
+    )
+    return result.rowcount or 0
+
+
+def _trip_form_values(trip=None):
     if request.method == "GET":
+        if trip is not None:
+            return {
+                "destination": trip.destination,
+                "start_date": trip.start_date.isoformat(),
+                "end_date": trip.end_date.isoformat(),
+                "style": trip.style,
+                "description": trip.description,
+                "expected_companions": str(trip.expected_companions),
+            }
         return {
             "destination": "",
             "start_date": "",
@@ -215,6 +326,8 @@ def _validate_trip_form(form):
         return "请选择有效的开始和结束日期。", None
     if end_date < start_date:
         return "结束日期不能早于开始日期。", None
+    if start_date < date.today():
+        return "开始日期不能早于今天。", None
 
     try:
         expected = int(form["expected_companions"])

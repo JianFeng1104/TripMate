@@ -10,7 +10,7 @@
       <div class="request-trip"><span class="mini-label">申请加入</span><a href="{{ url_for('main.trip_detail', trip_id=item.trip.id) }}">{{ item.trip.destination }}</a><small>{{ item.trip.start_date }} — {{ item.trip.end_date }}</small></div>
       <blockquote>{{ item.message or '未填写申请留言。' }}</blockquote>
       <div class="request-actions">
-        <span class="status status-{{ item.status|lower }}">{{ {'PENDING':'等待处理','ACCEPTED':'已接受','REJECTED':'已拒绝'}[item.status] }}</span>
+        <span class="status status-{{ item.status|lower }}">{{ {'PENDING':'等待处理','ACCEPTED':'已接受','REJECTED':'已拒绝','CANCELLED':'已取消（系统）','WITHDRAWN':'申请人撤回'}[item.status] }}</span>
         {% if item.status == 'PENDING' %}
           <form method="post" action="{{ url_for('main.handle_request', request_id=item.id, action='reject') }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button class="button button-ghost" type="submit">拒绝</button></form>
           <form method="post" action="{{ url_for('main.handle_request', request_id=item.id, action='accept') }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button class="button button-primary" type="submit">接受同行</button></form>
@@ -23,4 +23,3 @@
   <div class="empty-state"><span>◎</span><h2>还没有收到同行申请</h2><p>发布一条信息完整的旅行计划，让合适的人找到你。</p><a class="button button-primary" href="{{ url_for('main.create_trip') }}">发布计划</a></div>
 {% endif %}
 {% endblock %}
-

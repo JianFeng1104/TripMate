@@ -19,6 +19,7 @@ $env:TEMP = Join-Path $ProjectRoot ".tmp"
 $env:TMP = $env:TEMP
 $env:PIP_CACHE_DIR = Join-Path $ProjectRoot ".cache\pip"
 $env:PYTHONPYCACHEPREFIX = Join-Path $ProjectRoot ".cache\pycache"
+$env:TRIPMATE_ENV = "development"
 if (-not $env:TRIPMATE_SECRET_KEY) {
     $env:TRIPMATE_SECRET_KEY = "tripmate-e-drive-local-development"
 }
@@ -26,6 +27,11 @@ if (-not $env:TRIPMATE_SECRET_KEY) {
 New-Item -ItemType Directory -Force -Path $env:TEMP, $env:PIP_CACHE_DIR, $env:PYTHONPYCACHEPREFIX | Out-Null
 Push-Location $ProjectRoot
 try {
+    Write-Host "Applying TripMate database migrations..."
+    & $VenvPython -m flask --app run:app db upgrade
+    if ($LASTEXITCODE -ne 0) {
+        throw "TripMate database migration failed."
+    }
     if ($SeedDemo) {
         & $VenvPython -m flask --app run:app seed-demo
     }

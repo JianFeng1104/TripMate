@@ -5,32 +5,35 @@
   <div><p class="eyebrow">DISCOVER</p><h1>发现下一段旅程</h1><p>按目的地找到时间与风格合适的公开旅行计划。</p></div>
   <a class="button button-primary" href="{{ url_for('main.create_trip') }}">＋ 发布旅行计划</a>
 </section>
-<form class="search-bar" method="get">
-  <input type="search" name="q" maxlength="100" placeholder="搜索目的地，例如：东京" value="{{ query }}" aria-label="搜索目的地">
-  <button class="button button-dark" type="submit">搜索</button>
-  {% if query %}<a href="{{ url_for('main.trips') }}">清除</a>{% endif %}
+<form class="search-bar advanced-search" method="get">
+  <label class="search-destination">目的地<input type="search" name="q" maxlength="100" placeholder="例如：东京" value="{{ filters.destination }}"></label>
+  <label>旅行风格<select name="style"><option value="">不限</option>{% for style in styles %}<option value="{{ style }}" {% if filters.style == style %}selected{% endif %}>{{ style }}</option>{% endfor %}</select></label>
+  <label>目标开始日期<input type="date" name="start_date" value="{{ filters.start_date }}"></label>
+  <label>目标结束日期<input type="date" name="end_date" value="{{ filters.end_date }}"></label>
+  <label>至少剩余名额<input type="number" name="min_available_spots" min="0" max="20" value="{{ filters.min_available_spots }}" placeholder="不限"></label>
+  <div class="search-actions"><button class="button button-dark" type="submit">筛选旅程</button>{% if result.criteria.has_conditions %}<a href="{{ url_for('main.trips') }}">清除</a>{% endif %}</div>
 </form>
-{% if pagination.items %}
+{% if result['items'] %}
   <div class="trip-grid">
-    {% for trip in pagination.items %}
+    {% for trip in result['items'] %}
       <article class="trip-card">
         <div class="trip-card-top"><span class="status status-open">开放申请</span><span>{{ trip.style }}</span></div>
-        <h2><a href="{{ url_for('main.trip_detail', trip_id=trip.id) }}">{{ trip.destination }}</a></h2>
-        <p class="date-line">{{ trip.start_date.strftime('%Y.%m.%d') }} — {{ trip.end_date.strftime('%m.%d') }}</p>
+        <h2><a href="{{ url_for('main.trip_detail', trip_id=trip.trip_id) }}">{{ trip.destination }}</a></h2>
+        <p class="date-line">{{ trip.start_date }} — {{ trip.end_date }}</p>
         <p>{{ trip.description|truncate(105) }}</p>
+        {% if trip.compatibility %}<div class="compatibility-summary"><strong>规则匹配度 {{ trip.compatibility.score }}%</strong>{% for reason in trip.compatibility.reasons[:3] %}<span>✓ {{ reason }}</span>{% endfor %}</div>{% endif %}
         <div class="trip-card-bottom"><span>发起人 @{{ trip.creator.username }}</span><strong>剩余 {{ trip.remaining_spots }} 位</strong></div>
       </article>
     {% endfor %}
   </div>
-  {% if pagination.pages > 1 %}
+  {% if result.pagination.pages > 1 %}
     <nav class="pagination" aria-label="分页">
-      {% if pagination.has_prev %}<a href="{{ url_for('main.trips', page=pagination.prev_num, q=query) }}">上一页</a>{% endif %}
-      <span>第 {{ pagination.page }} / {{ pagination.pages }} 页</span>
-      {% if pagination.has_next %}<a href="{{ url_for('main.trips', page=pagination.next_num, q=query) }}">下一页</a>{% endif %}
+      {% if result.pagination.has_prev %}<a href="{{ url_for('main.trips', page=result.pagination.prev_num, q=result.criteria.destination, style=result.criteria.style, start_date=result.criteria.start_date, end_date=result.criteria.end_date, min_available_spots=result.criteria.min_available_spots) }}">上一页</a>{% endif %}
+      <span>第 {{ result.pagination.page }} / {{ result.pagination.pages }} 页</span>
+      {% if result.pagination.has_next %}<a href="{{ url_for('main.trips', page=result.pagination.next_num, q=result.criteria.destination, style=result.criteria.style, start_date=result.criteria.start_date, end_date=result.criteria.end_date, min_available_spots=result.criteria.min_available_spots) }}">下一页</a>{% endif %}
     </nav>
   {% endif %}
 {% else %}
   <div class="empty-state"><span>⌁</span><h2>暂时没有匹配的旅行计划</h2><p>换个关键词，或者发布第一条计划。</p><a class="button button-primary" href="{{ url_for('main.create_trip') }}">发布计划</a></div>
 {% endif %}
 {% endblock %}
-

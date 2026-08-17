@@ -1,7 +1,19 @@
+from datetime import date, timedelta
+
 import pytest
 
 from tripmate import create_app
 from tripmate.extensions import db
+
+
+@pytest.fixture(autouse=True)
+def block_real_deepseek_http(monkeypatch):
+    """Fail immediately if an automated test reaches the real provider transport."""
+
+    def blocked_urlopen(*_args, **_kwargs):
+        pytest.fail("Automated tests must not call the real DeepSeek API.")
+
+    monkeypatch.setattr("tripmate.agent.client.urlopen", blocked_urlopen)
 
 
 @pytest.fixture()
@@ -11,6 +23,7 @@ def app():
             "TESTING": True,
             "SECRET_KEY": "test-secret",
             "SQLALCHEMY_DATABASE_URI": "sqlite://",
+            "DEEPSEEK_API_KEY": "",
         }
     )
     with app.app_context():
@@ -64,14 +77,14 @@ class AuthActions:
 
 
 def create_trip(client, **overrides):
+    start_date = date.today() + timedelta(days=30)
     data = {
         "destination": "日本 · 东京",
-        "start_date": "2026-10-10",
-        "end_date": "2026-10-15",
+        "start_date": start_date.isoformat(),
+        "end_date": (start_date + timedelta(days=5)).isoformat(),
         "style": "城市探索",
         "description": "一起看展、散步和拍照，行程节奏轻松。",
         "expected_companions": "2",
     }
     data.update(overrides)
     return post_with_csrf(client, "/trips/new", data)
-

@@ -6,6 +6,14 @@ from tripmate.models import User
 from .conftest import post_with_csrf
 
 
+def test_session_cookie_name_is_project_specific(app, client):
+    assert app.config["SESSION_COOKIE_NAME"] == "tripmate_session"
+    response = client.get("/auth/login")
+    cookies = response.headers.getlist("Set-Cookie")
+    assert any(cookie.startswith("tripmate_session=") for cookie in cookies)
+    assert not any(cookie.startswith("culturemate_session=") for cookie in cookies)
+
+
 def test_registration_hashes_password_and_starts_session(app, client, auth):
     response = auth.register()
     assert response.status_code == 302
@@ -76,4 +84,3 @@ def test_external_next_url_is_not_used(client, auth):
     )
     assert response.status_code == 302
     assert response.headers["Location"].endswith("/trips")
-
