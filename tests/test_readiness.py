@@ -15,6 +15,20 @@ def test_health_endpoint_is_public_lightweight_json(client):
     assert response.headers["Referrer-Policy"] == "strict-origin-when-cross-origin"
 
 
+def test_guest_home_preview_and_javascript_are_browser_usable(client):
+    response = client.get("/")
+    page = response.get_data(as_text=True)
+
+    assert response.status_code == 200
+    assert "想去的地方" in page
+    assert "开始计划" in page
+
+    script = client.get("/static/js/app.js")
+    assert script.status_code == 200
+    assert script.mimetype == "application/javascript"
+    assert script.headers["X-Content-Type-Options"] == "nosniff"
+
+
 def test_404_uses_friendly_project_page_without_traceback(client):
     response = client.get("/does-not-exist")
     page = response.get_data(as_text=True)

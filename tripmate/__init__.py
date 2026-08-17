@@ -1,4 +1,5 @@
 import logging
+import mimetypes
 from pathlib import Path
 
 from flask import Flask, render_template
@@ -11,6 +12,9 @@ from .utils import csrf_token
 
 def create_app(test_config=None):
     """Create and configure the TripMate application."""
+    # Windows can register .js as text/plain.  With the nosniff security header,
+    # browsers then refuse to execute the script and reveal animations stay hidden.
+    mimetypes.add_type("application/javascript", ".js")
     app = Flask(__name__, instance_relative_config=True)
     instance_path = Path(app.instance_path)
     instance_path.mkdir(parents=True, exist_ok=True)
