@@ -1,15 +1,13 @@
-# TripMate Portfolio Screenshot Checklist
+# TripMate Portfolio Screenshots
 
-Capture screenshots only from demo data. Do not include browser cookies, environment variables, API keys or terminal secrets.
+Captured from the locally running Flask application at a 1440 × 1000 desktop viewport using only `seed-demo` data.
 
-| Suggested filename | Page | What it demonstrates |
+| File | Page | What it demonstrates |
 |---|---|---|
-| `01-trip-list.png` | Home / Trip list | Product overview, visual hierarchy and multiple Trip states |
-| `02-advanced-search.png` | Advanced search | Destination, style, date and available-capacity filters |
-| `03-trip-detail.png` | Trip detail | Creator, dates, capacity, status and JoinRequest entry point |
-| `04-my-trips.png` | My Trips / Requests | Ownership and application lifecycle states |
-| `05-assistant-input.png` | Travel Assistant | Authenticated SSR Agent interface and read-only explanation |
-| `06-assistant-result.png` | Travel Assistant result | DeepSeek Tool Calling over real TripMate data |
-| `07-compatibility.png` | Search/detail result | Deterministic compatibility score and explanation |
+| `trip-list.png` | Trip list | Multiple open Trips, dates, styles and remaining capacity |
+| `advanced-search.png` | Advanced search | Combined filters plus a real deterministic 100% compatibility result |
+| `trip-detail.png` | Trip detail | Creator, dates, confirmed companion, capacity and owner actions |
+| `trip-management.png` | Join request management | `ACCEPTED`, `REJECTED` and system `CANCELLED` lifecycle states |
+| `travel-assistant.png` | Travel Assistant | Authenticated read-only Assistant UI with a populated Demo question |
 
-Use a desktop viewport for the main set and optionally add one mobile-width screenshot to show responsive behavior.
+No DeepSeek request was submitted for this capture, so no generated answer is presented as a screenshot. The images contain no API key, real email address, cookie, CSRF value, terminal output or production database data.

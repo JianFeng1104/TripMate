@@ -23,6 +23,26 @@ The DeepSeek Travel Assistant adds natural-language discovery over this existing
 - Independent Alembic migration history and SQLite foreign-key enforcement.
 - Responsive Jinja UI, CSRF protection and project-specific Session cookie.
 
+## Demo Preview
+
+### Advanced Search and Compatibility
+
+![TripMate advanced search with deterministic compatibility](docs/screenshots/advanced-search.png)
+
+Filter real Trips by destination, style, dates and remaining capacity. Compatibility and reasons come from the deterministic Service layer.
+
+### Trip Detail and Capacity
+
+![TripMate trip detail and capacity management](docs/screenshots/trip-detail.png)
+
+Trip details expose lifecycle status, creator information, confirmed companions and remaining capacity without exposing private account data.
+
+### Read-only Travel Assistant
+
+![TripMate read-only travel assistant](docs/screenshots/travel-assistant.png)
+
+The Travel Assistant accepts natural-language questions and is restricted to read-only application tools; it cannot apply, edit or cancel on a user's behalf.
+
 ## Engineering Highlights
 
 - Lifecycle rules keep Trip status, accepted capacity and outstanding requests consistent.
@@ -170,7 +190,7 @@ python scripts\deepseek_agent_smoke.py
 python -m pytest -q
 ```
 
-Current result: **104 passed**. Tests block the real DeepSeek transport and use injected Fake Clients. Coverage includes authentication, CSRF, lifecycle permissions, capacity consistency, database constraints, migrations, search/scoring Services, Agent Tool Calling, Prompt Injection hardening and production-readiness behavior.
+Current result: **105 passed**. Tests block the real DeepSeek transport and use injected Fake Clients. Coverage includes authentication, CSRF, lifecycle permissions, capacity consistency, database constraints, migrations, search/scoring Services, Agent Tool Calling, Prompt Injection hardening and production-readiness behavior.
 
 ## Project Structure
 
