@@ -7,6 +7,7 @@ from tripmate.models import JoinRequest, Trip
 
 
 def test_health_endpoint_is_public_lightweight_json(client):
+    assert client.application.config["DEEPSEEK_API_KEY"] == ""
     response = client.get("/health")
 
     assert response.status_code == 200
@@ -82,6 +83,34 @@ def test_production_enforces_secure_cookie_and_safe_flags():
     assert production_app.config["SESSION_COOKIE_SECURE"] is True
 
 
+def test_demo_requires_a_non_default_secret(monkeypatch):
+    monkeypatch.delenv("TRIPMATE_SECRET_KEY", raising=False)
+    monkeypatch.delenv("SECRET_KEY", raising=False)
+
+    with pytest.raises(RuntimeError, match="SECRET_KEY must be configured"):
+        create_app({"APP_ENV": "demo", "SQLALCHEMY_DATABASE_URI": "sqlite://"})
+
+
+def test_demo_inherits_production_security_flags():
+    demo_app = create_app(
+        {
+            "APP_ENV": "demo",
+            "SECRET_KEY": "portfolio-demo-test-secret",
+            "SQLALCHEMY_DATABASE_URI": "sqlite://",
+            "DEBUG": True,
+            "TESTING": True,
+            "SESSION_COOKIE_SECURE": False,
+        }
+    )
+
+    assert demo_app.config["APP_ENV"] == "demo"
+    assert demo_app.debug is False
+    assert demo_app.testing is False
+    assert demo_app.config["SESSION_COOKIE_HTTPONLY"] is True
+    assert demo_app.config["SESSION_COOKIE_SAMESITE"] == "Lax"
+    assert demo_app.config["SESSION_COOKIE_SECURE"] is True
+
+
 def test_development_config_still_supports_local_http():
     development_app = create_app(
         {
@@ -120,6 +149,26 @@ def test_seed_demo_is_disabled_in_production():
 
     assert result.exit_code != 0
     assert "disabled in production" in result.output
+
+
+def test_seed_demo_is_allowed_by_explicit_demo_command():
+    demo_app = create_app(
+        {
+            "APP_ENV": "demo",
+            "SECRET_KEY": "portfolio-demo-test-secret",
+            "SQLALCHEMY_DATABASE_URI": "sqlite://",
+        }
+    )
+    with demo_app.app_context():
+        db.create_all()
+    try:
+        result = demo_app.test_cli_runner().invoke(args=["seed-demo"])
+        assert result.exit_code == 0, result.output
+        assert "已创建 3 个演示账号" in result.output
+    finally:
+        with demo_app.app_context():
+            db.session.remove()
+            db.drop_all()
 
 
 def test_demo_seed_covers_portfolio_lifecycle_states(app, runner):

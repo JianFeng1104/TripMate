@@ -16,9 +16,9 @@ def load_local_environment(
 ) -> bool:
     """Load a development ``.env`` file while preserving existing OS values.
 
-    Production and test processes deliberately skip local files.  Hosting-platform
-    variables and values explicitly set in PowerShell win because ``override`` is
-    disabled.
+    Test, demo and production processes deliberately skip local files.
+    Hosting-platform variables and values explicitly set in PowerShell win because
+    ``override`` is disabled.
     """
 
     effective_environment = str(

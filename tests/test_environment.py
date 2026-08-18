@@ -1,3 +1,5 @@
+import pytest
+
 from tripmate import create_app
 from tripmate import environment as environment_module
 
@@ -64,4 +66,28 @@ def test_missing_dotenv_does_not_prevent_app_startup(monkeypatch, tmp_path):
     )
 
     assert app.config["APP_ENV"] == "development"
+    assert app.config["DEEPSEEK_API_KEY"] == ""
+
+
+@pytest.mark.parametrize(
+    "requested_environment", ["testing", "production", "demo", "portfolio"]
+)
+def test_non_development_environments_do_not_load_dotenv(
+    monkeypatch, tmp_path, requested_environment
+):
+    _clear_deepseek_environment(monkeypatch)
+    monkeypatch.setattr(environment_module, "PROJECT_ROOT", tmp_path)
+    (tmp_path / ".env").write_text(
+        "DEEPSEEK_API_KEY=dotenv-test-value\n",
+        encoding="utf-8",
+    )
+
+    app = create_app(
+        {
+            "APP_ENV": requested_environment,
+            "SECRET_KEY": "secure-environment-test-secret",
+            "SQLALCHEMY_DATABASE_URI": "sqlite://",
+        }
+    )
+
     assert app.config["DEEPSEEK_API_KEY"] == ""

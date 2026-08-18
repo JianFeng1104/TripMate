@@ -13,7 +13,7 @@ from .models import JoinRequest, Trip, User
 @with_appcontext
 def seed_demo():
     """Add a DEV/DEMO-only, repeatable portfolio dataset."""
-    if current_app.config["APP_ENV"] == "production":
+    if current_app.config["APP_ENV"] not in {"development", "testing", "demo"}:
         raise click.ClickException("seed-demo is disabled in production.")
     if db.session.scalar(select(User.id).limit(1)):
         click.echo("数据库中已有用户；为避免覆盖，未写入演示数据。")

@@ -95,7 +95,7 @@ See [Architecture](docs/ARCHITECTURE.md) for layer responsibilities and invarian
 - Flask 3.1 and Jinja2
 - Flask-SQLAlchemy / SQLAlchemy 2
 - Flask-Migrate / Alembic
-- SQLite
+- SQLite locally; PostgreSQL-ready deployment through `DATABASE_URL`
 - HTML, CSS and vanilla JavaScript
 - DeepSeek Chat Completions API with Tool Calling
 - Gunicorn production WSGI server
@@ -149,7 +149,7 @@ For local development, copy [.env.example](.env.example) to the ignored `.env` f
 
 | Variable | Required | Purpose |
 |---|---:|---|
-| `TRIPMATE_ENV` | Production | `development`, `testing` or `production` |
+| `TRIPMATE_ENV` | Production | `development`, `testing`, `demo` or `production` |
 | `TRIPMATE_SECRET_KEY` or `SECRET_KEY` | Production | Flask Session signing secret |
 | `TRIPMATE_DATABASE_URI` | No | Project-specific SQLAlchemy URI override |
 | `DATABASE_URL` | No | Deployment-friendly database URI override |
@@ -223,7 +223,7 @@ Run `seed-demo` only in development. Demo accounts use password `Demo123!` and f
 The seed includes `OPEN`, `CLOSED` and `CANCELLED` Trips plus all JoinRequest states. Credentials are **DEMO ONLY** and are never created automatically in production.
 
 - Screenshot plan: [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md)
-- Deployment-ready; live demo URL to be added.
+- Railway-ready; live demo URL will be added only after a real deployment.
 
 ## Production Start
 
@@ -231,15 +231,15 @@ Development uses Flask's server. A Linux production service uses Gunicorn:
 
 ```bash
 python -m flask --app run:app db upgrade
-gunicorn --bind 0.0.0.0:${PORT:-8000} --workers 2 wsgi:app
+gunicorn --bind 0.0.0.0:$PORT --workers 2 wsgi:app
 ```
 
 Health check: `GET /health` → `{"service":"TripMate","status":"ok"}`. See [Deployment Guide](docs/DEPLOYMENT.md) before publishing.
 
 ## Limitations
 
-- SQLite is appropriate for the current MVP but requires persistent storage and has limited write concurrency.
-- Ephemeral cloud filesystems can erase a SQLite database; managed PostgreSQL is recommended for a long-running public deployment.
+- Local development defaults to SQLite; Railway deployment is configured for managed PostgreSQL.
+- A live fresh-PostgreSQL migration run remains a deployment-time verification because no local PostgreSQL service is bundled.
 - Trip ranking currently includes Python-side availability/scoring work that would need optimization at larger scale.
 - The Agent has no persistent chat history, streaming output, write actions or per-user distributed rate limit.
 - Prompt Injection risk can be reduced but not completely eliminated.

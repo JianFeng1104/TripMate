@@ -41,10 +41,18 @@ class ProductionConfig(BaseConfig):
     PREFERRED_URL_SCHEME = "https"
 
 
+class DemoConfig(ProductionConfig):
+    """Production security with explicit portfolio demo seeding enabled."""
+
+    APP_ENV = "demo"
+
+
 CONFIGS = {
     "development": DevelopmentConfig,
     "testing": TestingConfig,
     "production": ProductionConfig,
+    "demo": DemoConfig,
+    "portfolio": DemoConfig,
 }
 
 
@@ -74,15 +82,16 @@ def configure_app(app, instance_path: Path, overrides: dict[str, Any] | None = N
 
     app.config.from_object(config_class)
     secret_key = os.environ.get("TRIPMATE_SECRET_KEY") or os.environ.get("SECRET_KEY")
-    if not secret_key and environment != "production":
+    if not secret_key and not issubclass(config_class, ProductionConfig):
         secret_key = DEVELOPMENT_SECRET if environment == "development" else "test-secret"
+    database_uri = (
+        os.environ.get("DATABASE_URL")
+        or os.environ.get("TRIPMATE_DATABASE_URI")
+        or f"sqlite:///{instance_path / 'tripmate.db'}"
+    )
     app.config.from_mapping(
         SECRET_KEY=secret_key,
-        SQLALCHEMY_DATABASE_URI=(
-            os.environ.get("DATABASE_URL")
-            or os.environ.get("TRIPMATE_DATABASE_URI")
-            or f"sqlite:///{instance_path / 'tripmate.db'}"
-        ),
+        SQLALCHEMY_DATABASE_URI=_normalize_database_url(database_uri),
         DEEPSEEK_API_KEY=os.environ.get("DEEPSEEK_API_KEY", ""),
         DEEPSEEK_BASE_URL=os.environ.get(
             "DEEPSEEK_BASE_URL", "https://api.deepseek.com"
@@ -92,17 +101,29 @@ def configure_app(app, instance_path: Path, overrides: dict[str, Any] | None = N
         LOG_LEVEL=os.environ.get("LOG_LEVEL", "INFO").upper(),
     )
     app.config.update(overrides)
-    if app.config.get("APP_ENV") == "production":
+    if app.config.get("APP_ENV") in {"production", "demo"}:
         app.config.update(DEBUG=False, TESTING=False, SESSION_COOKIE_SECURE=True)
-    _validate_production_config(app.config)
+    _validate_secure_config(app.config)
 
 
-def _validate_production_config(config: dict[str, Any]) -> None:
-    if config.get("APP_ENV") != "production":
+def _validate_secure_config(config: dict[str, Any]) -> None:
+    if config.get("APP_ENV") not in {"production", "demo"}:
         return
     secret_key = str(config.get("SECRET_KEY") or "").strip()
-    if not secret_key or secret_key in {DEVELOPMENT_SECRET, "replace-me"}:
-        raise RuntimeError("SECRET_KEY must be configured in production.")
+    if not secret_key or secret_key in {
+        DEVELOPMENT_SECRET,
+        "replace-me",
+        "replace-with-local-secret",
+    }:
+        raise RuntimeError("SECRET_KEY must be configured in production or demo.")
+
+
+def _normalize_database_url(database_url: str) -> str:
+    """Select the installed psycopg 3 dialect for Railway PostgreSQL URLs."""
+
+    if database_url.startswith("postgresql://"):
+        return database_url.replace("postgresql://", "postgresql+psycopg://", 1)
+    return database_url
 
 
 def _environment_flag(name: str) -> bool:

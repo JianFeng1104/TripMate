@@ -16,19 +16,22 @@ branch_labels = None
 depends_on = None
 
 
+def _replace_status_constraint(condition):
+    if op.get_bind().dialect.name == "sqlite":
+        with op.batch_alter_table("join_request", recreate="always") as batch_op:
+            batch_op.drop_constraint("ck_request_status", type_="check")
+            batch_op.create_check_constraint("ck_request_status", condition)
+        return
+
+    op.drop_constraint("ck_request_status", "join_request", type_="check")
+    op.create_check_constraint("ck_request_status", "join_request", condition)
+
+
 def upgrade():
-    with op.batch_alter_table("join_request", recreate="always") as batch_op:
-        batch_op.drop_constraint("ck_request_status", type_="check")
-        batch_op.create_check_constraint(
-            "ck_request_status",
-            "status IN ('PENDING', 'ACCEPTED', 'REJECTED', 'CANCELLED')",
-        )
+    _replace_status_constraint(
+        "status IN ('PENDING', 'ACCEPTED', 'REJECTED', 'CANCELLED')"
+    )
 
 
 def downgrade():
-    with op.batch_alter_table("join_request", recreate="always") as batch_op:
-        batch_op.drop_constraint("ck_request_status", type_="check")
-        batch_op.create_check_constraint(
-            "ck_request_status",
-            "status IN ('PENDING', 'ACCEPTED', 'REJECTED')",
-        )
+    _replace_status_constraint("status IN ('PENDING', 'ACCEPTED', 'REJECTED')")
