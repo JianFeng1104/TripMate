@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}TripMate{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/premium.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/premium.css', v='final-portfolio') }}">
 </head>
 <body class="{% if g.user %}is-authenticated{% else %}is-guest{% endif %}">
   <header class="site-header">
@@ -43,6 +43,6 @@
   <footer>
     <div class="footer-inner"><strong>TripMate</strong><span>认真计划，自在同行。</span><small>© 2026</small></div>
   </footer>
-  <script src="{{ url_for('static', filename='js/app.js', v='1.7.1-preview-fix') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/app.js', v='final-portfolio') }}" defer></script>
 </body>
 </html>

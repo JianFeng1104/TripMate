@@ -2,6 +2,7 @@
 
 from flask import Blueprint, current_app, g, render_template, request
 
+from ..presentation import render_agent_markdown
 from ..utils import login_required, validate_csrf
 from .client import DeepSeekClient
 from .exceptions import (
@@ -65,9 +66,10 @@ def travel_assistant():
                     category,
                 )
                 error = "The AI assistant is temporarily unavailable. Please try again later."
+    sanitized_answer_html = render_agent_markdown(answer) if answer else None
     return render_template(
         "agent/travel_assistant.html",
         question=question,
-        answer=answer,
+        sanitized_answer_html=sanitized_answer_html,
         error=error,
     )

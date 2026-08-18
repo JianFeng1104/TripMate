@@ -4,6 +4,29 @@ document.querySelectorAll("form[data-confirm]").forEach((form) => {
   });
 });
 
+document.querySelectorAll("[data-assistant-form]").forEach((form) => {
+  form.addEventListener("submit", () => {
+    if (!form.checkValidity()) return;
+
+    const button = form.querySelector("[data-assistant-submit]");
+    const output = document.querySelector("[data-assistant-output]");
+    const loading = output?.querySelector("[data-assistant-loading]");
+
+    form.setAttribute("aria-busy", "true");
+    if (button) {
+      button.disabled = true;
+      button.textContent = button.dataset.loadingLabel || "Thinking...";
+    }
+    if (output && loading) {
+      output.setAttribute("aria-busy", "true");
+      output.querySelectorAll("[data-assistant-state]").forEach((state) => {
+        state.hidden = true;
+      });
+      loading.hidden = false;
+    }
+  });
+});
+
 const revealItems = document.querySelectorAll(
   ".hero > *, .home-intro > *, .trip-card, .record, .request-card, .form-card, .action-panel"
 );

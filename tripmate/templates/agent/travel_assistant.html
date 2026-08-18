@@ -3,16 +3,20 @@
 {% block content %}
 <section class="page-head split-head"><div><p class="eyebrow">READ-ONLY ASSISTANT</p><h1>TripMate Travel Assistant</h1><p>用自然语言查找真实旅行、剩余名额和规则匹配度。助手只读取数据，不会替你执行申请、编辑或取消操作。</p></div><a class="button button-ghost" href="{{ url_for('main.trips') }}">返回发现旅程</a></section>
 <section class="assistant-layout">
-  <form class="assistant-form" method="post">
+  <form class="assistant-form" method="post" data-assistant-form aria-busy="false">
     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     <label>你的旅行问题 <span>最多 3000 字</span><textarea name="question" maxlength="3000" rows="7" required placeholder="例如：帮我找九月去东京、偏好摄影且至少还有一个名额的旅行。">{{ question }}</textarea></label>
-    <button class="button button-primary" type="submit">Ask Assistant</button>
+    <button class="button button-primary" type="submit" data-assistant-submit data-loading-label="Thinking...">Ask Assistant</button>
   </form>
-  <div class="assistant-answer" aria-live="polite">
+  <div class="assistant-answer" aria-live="polite" aria-busy="false" data-assistant-output>
     <span class="mini-label">ASSISTANT ANSWER</span>
-    {% if error %}<div class="assistant-error">{{ error }}</div>
-    {% elif answer %}<div class="assistant-content">{{ answer }}</div>
-    {% else %}<p class="muted">提交问题后，助手会通过只读工具查询 TripMate 的真实数据。</p>{% endif %}
+    <div class="assistant-loading" data-assistant-loading role="status" hidden>
+      <strong>Thinking<span class="assistant-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></strong>
+      <p>正在查询真实数据并生成回答，请稍候。</p>
+    </div>
+    {% if error %}<div class="assistant-error" data-assistant-state>{{ error }}</div>
+    {% elif sanitized_answer_html %}<div class="assistant-content" data-assistant-state>{{ sanitized_answer_html }}</div>
+    {% else %}<p class="muted" data-assistant-state>提交问题后，助手会通过只读工具查询 TripMate 的真实数据。</p>{% endif %}
   </div>
 </section>
 {% endblock %}
