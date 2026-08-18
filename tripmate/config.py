@@ -4,6 +4,8 @@ import os
 from pathlib import Path
 from typing import Any
 
+from .environment import load_local_environment
+
 
 DEVELOPMENT_SECRET = "tripmate-local-development-key"
 
@@ -53,6 +55,13 @@ def configure_app(app, instance_path: Path, overrides: dict[str, Any] | None = N
     requested_env = overrides.get("APP_ENV")
     if not requested_env and overrides.get("TESTING"):
         requested_env = "testing"
+    bootstrap_environment = str(
+        requested_env
+        or os.environ.get("TRIPMATE_ENV")
+        or os.environ.get("APP_ENV")
+        or "development"
+    ).lower()
+    load_local_environment(environment=bootstrap_environment)
     environment = str(
         requested_env
         or os.environ.get("TRIPMATE_ENV")

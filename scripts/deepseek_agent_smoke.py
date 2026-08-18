@@ -12,6 +12,11 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
+from tripmate.environment import load_local_environment  # noqa: E402
+
+
+load_local_environment()
+
 from tripmate import create_app  # noqa: E402
 from tripmate.agent import AgentRunner, DeepSeekClient  # noqa: E402
 from tripmate.agent.exceptions import AgentError  # noqa: E402

@@ -126,8 +126,8 @@ py -3.13 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 
-$env:TRIPMATE_ENV = "development"
-$env:TRIPMATE_SECRET_KEY = "local-development-only"
+# One-time local configuration. Edit .env and add your own values.
+Copy-Item .env.example .env
 
 python -m flask --app run:app db upgrade
 python -m flask --app run:app seed-demo
@@ -145,7 +145,7 @@ Open <http://127.0.0.1:5000>. The existing E-drive workflow remains available:
 
 ## Environment Variables
 
-Use [.env.example](.env.example) as a reference; the application does not require a `.env` file and no real secrets belong in Git.
+For local development, copy [.env.example](.env.example) to the ignored `.env` file once and edit it locally. `.env` is local only and ignored by Git. Flask startup and the manual Agent smoke script load it automatically, so reopening PowerShell no longer requires setting the same variables again. Existing PowerShell/OS variables take precedence, and production continues to use hosting-platform variables. The application still starts without `.env`; no real secrets belong in Git.
 
 | Variable | Required | Purpose |
 |---|---:|---|
@@ -174,7 +174,7 @@ Production releases must run `db upgrade` before starting new workers. Test fixt
 ## DeepSeek Agent
 
 ```powershell
-$env:DEEPSEEK_API_KEY = "your-local-key"
+# Put DEEPSEEK_API_KEY in the ignored .env file, then restart the app.
 python -m flask --app run:app run --port 5000
 ```
 
