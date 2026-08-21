@@ -7,6 +7,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 from .config import configure_app
 from .extensions import db, migrate
+from .image_resolver import get_destination_visual
 from .utils import csrf_token
 
 
@@ -28,6 +29,7 @@ def create_app(test_config=None):
     db.init_app(app)
     migrate.init_app(app, db)
     app.jinja_env.globals["csrf_token"] = csrf_token
+    app.jinja_env.globals["destination_visual"] = get_destination_visual
 
     from . import models  # noqa: F401
     from .auth import bp as auth_bp

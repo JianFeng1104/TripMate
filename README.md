@@ -18,17 +18,23 @@ TripMate is a personal portfolio project built around complete travel and join-r
 
 ## Product Preview
 
+### Product landing
+
+![TripMate product landing](docs/screenshots/landing.png)
+
+The public landing page presents the real product boundaries through a cinematic travel-editorial interface: deterministic matching, explainable scoring and a read-only assistant remain explicit.
+
 ### Travel discovery and advanced search
 
 ![TripMate travel discovery](docs/screenshots/trip-list.png)
 
 Users can combine destination, travel style, date overlap and minimum remaining-capacity filters. Results are ranked with explainable rule-based compatibility when search criteria are present.
 
-### Join-request lifecycle
+### Trip detail and capacity
 
-![TripMate request management](docs/screenshots/trip-management.png)
+![TripMate trip detail](docs/screenshots/trip-detail.png)
 
-Creators review requests while Trip and JoinRequest state transitions preserve remaining capacity and cancel stale pending requests when a trip closes or fills.
+Destination imagery, status, dates, creator context and remaining capacity are presented together without adding image fields to the Trip schema.
 
 ### Read-only Travel Assistant
 
@@ -41,6 +47,7 @@ The assistant converts natural-language travel requirements into validated read-
 - Account registration, login, logout and password hashing.
 - Travel creation, editing, cancellation and public detail pages.
 - Advanced travel search by destination, style, date overlap and remaining spots.
+- Destination image resolver with optional Unsplash lookup, in-process TTL cache and bundled local fallbacks.
 - Paginated discovery with stable deterministic ordering.
 - Explainable compatibility score across destination, dates, style and capacity.
 - JoinRequest lifecycle: `PENDING`, `ACCEPTED`, `REJECTED`, `CANCELLED`, `WITHDRAWN`.
@@ -159,6 +166,7 @@ Open <http://127.0.0.1:5000>. The ignored `.env` file is for local secrets only;
 | `DEEPSEEK_API_KEY` | Enables Travel Assistant requests |
 | `DEEPSEEK_BASE_URL` | DeepSeek API base URL |
 | `DEEPSEEK_MODEL` | Configured DeepSeek model |
+| `UNSPLASH_ACCESS_KEY` | Optional destination-image search; bundled local images are used when empty |
 | `TRIPMATE_TRUST_PROXY` | Enables the expected single trusted proxy hop |
 
 Never commit a populated `.env`, database credentials or API keys.
@@ -182,7 +190,7 @@ python -m pytest -q
 python -m pip check
 ```
 
-Current local result: **128 passed**.
+Current local result: **132 passed**.
 
 Automated tests use fake provider clients and do not call the real DeepSeek API. The online demo is separately verified against Railway PostgreSQL and the configured provider.
 

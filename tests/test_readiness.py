@@ -21,8 +21,9 @@ def test_guest_home_preview_and_javascript_are_browser_usable(client):
     page = response.get_data(as_text=True)
 
     assert response.status_code == 200
-    assert "想去的地方" in page
-    assert "开始计划" in page
+    assert "Find Your Next" in page
+    assert "Travel Companion" in page
+    assert "开始发现旅程" in page
 
     script = client.get("/static/js/app.js")
     assert script.status_code == 200

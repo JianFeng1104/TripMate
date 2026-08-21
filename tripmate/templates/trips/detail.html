@@ -3,6 +3,8 @@
 {% block content %}
 <article class="detail-layout">
   <section class="trip-detail">
+    {% set visual = destination_visual(trip.destination) %}
+    <figure class="detail-visual"><img src="{{ visual.url }}" alt="{{ trip.destination }}目的地风景"><figcaption><span>{{ visual.country }}</span><strong>{{ trip.destination }}</strong></figcaption></figure>
     <div class="detail-meta"><span class="status status-{{ trip.status|lower }}">{{ {'OPEN':'开放申请','CLOSED':'已关闭','CANCELLED':'旅行已取消'}[trip.status] }}</span><span>{{ trip.style }}</span><span>由 @{{ trip.creator.username }} 发布</span></div>
     <h1>{{ trip.destination }}</h1>
     <p class="detail-date">{{ trip.start_date.strftime('%Y 年 %m 月 %d 日') }} — {{ trip.end_date.strftime('%Y 年 %m 月 %d 日') }}</p>

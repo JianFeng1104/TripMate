@@ -16,13 +16,18 @@
 {% if result['items'] %}
   <div class="trip-grid">
     {% for trip in result['items'] %}
-      <article class="trip-card">
-        <div class="trip-card-top"><span class="status status-open">开放申请</span><span>{{ trip.style }}</span></div>
-        <h2><a href="{{ url_for('main.trip_detail', trip_id=trip.trip_id) }}">{{ trip.destination }}</a></h2>
-        <p class="date-line">{{ trip.start_date }} — {{ trip.end_date }}</p>
-        <p>{{ trip.description|truncate(105) }}</p>
-        {% if trip.compatibility %}<div class="compatibility-summary"><strong>规则匹配度 {{ trip.compatibility.score }}%</strong>{% for reason in trip.compatibility.reasons[:3] %}<span>✓ {{ reason }}</span>{% endfor %}</div>{% endif %}
-        <div class="trip-card-bottom"><span>发起人 @{{ trip.creator.username }}</span><strong>剩余 {{ trip.remaining_spots }} 位</strong></div>
+      {% set visual = destination_visual(trip.destination) %}
+      <article class="trip-card" data-reveal>
+        <a class="trip-card-image" href="{{ url_for('main.trip_detail', trip_id=trip.trip_id) }}"><img src="{{ visual.url }}" alt="{{ trip.destination }}目的地风景" loading="lazy"><span class="country-badge">{{ visual.country }}</span>{% if trip.compatibility %}<span class="score-badge">{{ trip.compatibility.score }}% Match</span>{% endif %}</a>
+        <div class="trip-card-content">
+          <div class="trip-card-top"><span class="status status-open"><i aria-hidden="true"></i>开放申请</span><span class="style-badge">{{ trip.style }}</span></div>
+          <h2><a href="{{ url_for('main.trip_detail', trip_id=trip.trip_id) }}">{{ trip.destination }}</a></h2>
+          <p class="date-line"><span>◷</span>{{ trip.start_date }} — {{ trip.end_date }}</p>
+          <p class="trip-excerpt">{{ trip.description|truncate(105) }}</p>
+          {% if trip.compatibility %}<div class="compatibility-summary"><strong>为什么适合你</strong>{% for reason in trip.compatibility.reasons[:2] %}<span>✓ {{ reason }}</span>{% endfor %}</div>{% endif %}
+          <div class="capacity"><div><span>名额状态</span><strong>{{ trip.remaining_spots }} / {{ trip.expected_companions }} 可用</strong></div><div class="capacity-track"><span style="width: {{ (trip.remaining_spots * 100 / trip.expected_companions)|round|int }}%"></span></div></div>
+          <div class="trip-card-bottom"><span>发起人 @{{ trip.creator.username }}</span><a href="{{ url_for('main.trip_detail', trip_id=trip.trip_id) }}" aria-label="查看{{ trip.destination }}详情">查看详情 →</a></div>
+        </div>
       </article>
     {% endfor %}
   </div>

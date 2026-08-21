@@ -1,3 +1,14 @@
+document.documentElement.classList.add("has-motion");
+
+document.querySelectorAll("[data-nav-toggle]").forEach((toggle) => {
+  const nav = document.querySelector("[data-primary-nav]");
+  toggle.addEventListener("click", () => {
+    const isOpen = toggle.getAttribute("aria-expanded") === "true";
+    toggle.setAttribute("aria-expanded", String(!isOpen));
+    nav?.classList.toggle("is-open", !isOpen);
+  });
+});
+
 document.querySelectorAll("form[data-confirm]").forEach((form) => {
   form.addEventListener("submit", (event) => {
     if (!window.confirm(form.dataset.confirm)) event.preventDefault();
@@ -11,6 +22,7 @@ document.querySelectorAll("[data-assistant-form]").forEach((form) => {
     const button = form.querySelector("[data-assistant-submit]");
     const output = document.querySelector("[data-assistant-output]");
     const loading = output?.querySelector("[data-assistant-loading]");
+    const thinkingText = loading?.querySelector("[data-thinking-text]");
 
     form.setAttribute("aria-busy", "true");
     if (button) {
@@ -23,12 +35,17 @@ document.querySelectorAll("[data-assistant-form]").forEach((form) => {
         state.hidden = true;
       });
       loading.hidden = false;
+      let dots = 1;
+      window.setInterval(() => {
+        dots = (dots % 3) + 1;
+        if (thinkingText) thinkingText.textContent = `Thinking${".".repeat(dots)}`;
+      }, 420);
     }
   });
 });
 
 const revealItems = document.querySelectorAll(
-  ".hero > *, .home-intro > *, .trip-card, .record, .request-card, .form-card, .action-panel"
+  "[data-reveal], .record, .request-card, .form-card, .action-panel, .form-section"
 );
 
 const showAllRevealItems = () => {
@@ -57,7 +74,7 @@ if (
 
     // Some embedded or background browsers do not deliver intersection events.
     // Content must remain usable even when the enhancement cannot run.
-    window.setTimeout(showAllRevealItems, 1200);
+    window.setTimeout(showAllRevealItems, 700);
   } catch (_error) {
     showAllRevealItems();
   }

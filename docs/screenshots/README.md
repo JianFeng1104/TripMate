@@ -2,6 +2,7 @@
 
 本目录中的 PNG 均来自当前 Flask 项目的本地运行页面，使用 `seed-demo` 生成的虚构数据：
 
+- `landing.png`
 - `trip-list.png`
 - `advanced-search.png`
 - `trip-detail.png`

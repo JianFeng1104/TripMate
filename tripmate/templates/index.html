@@ -1,27 +1,26 @@
 {% extends "base.html" %}
 {% block title %}TripMate · 旅行搭子平台{% endblock %}
 {% block content %}
-<section class="hero">
-  <div class="hero-copy">
-    <p class="eyebrow">PLAN LESS · GO FURTHER</p>
-    <h1>想去的地方，<br><em>一起出发。</em></h1>
-    <p class="hero-lead">写下目的地、日期和你喜欢的旅行节奏，找到刚好同路的人。没有复杂社交，先从一份清楚的计划开始。</p>
-    <div class="button-row">
-      <a class="button button-primary" href="{{ url_for('auth.register') }}">开始计划</a>
-      <a class="button button-ghost" href="{{ url_for('auth.login') }}">已有账号</a>
-    </div>
+<section class="journey-hero">
+  <div class="journey-heading" data-reveal>
+    <div class="issue-line"><span>JOURNAL 01 / 2026</span><span>31.2304° N · 121.4737° E</span></div>
+    <p class="eyebrow">GO SOMEWHERE WORTH REMEMBERING</p>
+    <h1>Find Your Next<br><em>Travel Companion</em></h1>
+    <div class="journey-intro"><p>真实行程，清楚日期，合适节奏。TripMate 帮你先找到同路的人，再决定是否一起出发。</p><div class="button-row"><a class="button button-primary" href="{{ url_for('auth.register') }}">开始发现旅程 <span aria-hidden="true">↗</span></a><a class="button button-ghost" href="{{ url_for('auth.login') }}">登录 Demo</a></div></div>
   </div>
-  <figure class="hero-visual">
+  <figure class="journey-photo" data-reveal>
     <img src="{{ url_for('static', filename='img/tokyo-night.jpg') }}" alt="东京夜晚街道与远处的东京塔">
-    <figcaption><span>Tokyo after dark</span><span>城市漫步 · 5 天</span></figcaption>
+    <figcaption><span>TOKYO / NIGHT WALK</span><strong>01</strong></figcaption>
+    <div class="route-ticket"><small>ROUTE NOTE</small><strong>Tokyo</strong><span>城市探索 · 5 天</span><i></i></div>
   </figure>
 </section>
-<section class="home-intro" aria-label="使用方式">
-  <div class="intro-heading"><p class="eyebrow">HOW IT WORKS</p><h2>旅行从一条<br>清楚的计划开始。</h2></div>
-  <div class="intro-list">
-    <article><span>目的地</span><h3>说清楚去哪里</h3><p>公开日期、旅行方式和期待人数，让合适的人更快看见你。</p></article>
-    <article><span>申请</span><h3>先了解，再同行</h3><p>查看简介和留言，是否接受由旅行发起人决定。</p></article>
-    <article><span>确认</span><h3>把同行关系定下来</h3><p>双方都能看到当前状态，人数满员后即可关闭计划。</p></article>
+<div class="route-marquee" aria-label="旅行目的地"><div><span>TOKYO</span><i>↗</i><span>DALI</span><i>↗</i><span>PENANG</span><i>↗</i><span>LONDON</span><i>↗</i><span>PARIS</span><i>↗</i><span>TOKYO</span><i>↗</i><span>DALI</span></div></div>
+<section class="journey-features" aria-labelledby="features-title">
+  <header data-reveal><p class="eyebrow">TRAVEL, WITH CONTEXT</p><h2 id="features-title">不是随机遇见。<br><em>是刚好同路。</em></h2><p>目的地只是开始。时间、旅行方式与剩余名额，决定一段计划是否真的适合你。</p></header>
+  <div class="feature-ledger">
+    <article data-reveal><span>01</span><div><h3>Travel Matching</h3><p>组合目的地、日期、风格与名额，留下真正可参加的开放行程。</p></div><b>EXPLORE</b></article>
+    <article data-reveal><span>02</span><div><h3>Compatibility Score</h3><p>每一分都有可读理由，不用相信一个无法解释的推荐黑盒。</p></div><b>COMPARE</b></article>
+    <article data-reveal><span>03</span><div><h3>Read-only Travel Assistant</h3><p>自然语言查询真实旅行数据；助手只读，所有决定仍由旅行者完成。</p></div><b>ASK</b></article>
   </div>
 </section>
 {% endblock %}

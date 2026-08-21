@@ -2,6 +2,11 @@
 {% block title %}我的旅行 · TripMate{% endblock %}
 {% block content %}
 <section class="page-head split-head"><div><p class="eyebrow">MY TRIPS</p><h1>我的旅行</h1><p>集中查看你创建的计划与发出的同行申请。</p></div><a class="button button-primary" href="{{ url_for('main.create_trip') }}">＋ 发布计划</a></section>
+<section class="metric-grid" aria-label="旅行概览">
+  <article><span>我创建的计划</span><strong>{{ created|length }}</strong><small>全部状态</small></article>
+  <article><span>开放中的计划</span><strong>{{ created|selectattr('status', 'equalto', 'OPEN')|list|length }}</strong><small>可继续接受申请</small></article>
+  <article><span>我发出的申请</span><strong>{{ applications|length }}</strong><small>真实申请记录</small></article>
+</section>
 <section class="dashboard-section">
   <div class="section-title"><h2>我创建的计划</h2><span>{{ created|length }} 条</span></div>
   {% if created %}<div class="record-list">{% for trip in created %}<a class="record" href="{{ url_for('main.trip_detail', trip_id=trip.id) }}"><div><span class="status status-{{ trip.status|lower }}">{{ {'OPEN':'开放','CLOSED':'关闭','CANCELLED':'旅行取消'}[trip.status] }}</span><h3>{{ trip.destination }}</h3><p>{{ trip.start_date }} — {{ trip.end_date }} · {{ trip.style }}</p></div><div class="record-stat"><strong>{{ trip.join_requests|selectattr('status', 'equalto', 'PENDING')|list|length }}</strong><span>待处理申请</span></div></a>{% endfor %}</div>
