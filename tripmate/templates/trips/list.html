@@ -19,6 +19,7 @@
       {% set visual = destination_visual(trip.destination) %}
       <article class="trip-card" data-reveal>
         <a class="trip-card-image" href="{{ url_for('main.trip_detail', trip_id=trip.trip_id) }}"><img src="{{ visual.url }}" alt="{{ trip.destination }}目的地风景" loading="lazy"><span class="country-badge">{{ visual.country }}</span>{% if trip.compatibility %}<span class="score-badge">{{ trip.compatibility.score }}% Match</span>{% endif %}</a>
+        {% if visual.source == 'unsplash' %}<p class="photo-credit">Photo by <a href="{{ visual.photographer_url }}">{{ visual.photographer_name }}</a> on <a href="{{ visual.unsplash_url }}">Unsplash</a></p>{% endif %}
         <div class="trip-card-content">
           <div class="trip-card-top"><span class="status status-open"><i aria-hidden="true"></i>开放申请</span><span class="style-badge">{{ trip.style }}</span></div>
           <h2><a href="{{ url_for('main.trip_detail', trip_id=trip.trip_id) }}">{{ trip.destination }}</a></h2>
